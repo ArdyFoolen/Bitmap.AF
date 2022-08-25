@@ -22,9 +22,8 @@ namespace Bitmap.AF
             {
                 using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
-                    fs.Write(Header.ToBytes());
-                    fs.Write(OS21XHeader.ToBytes());
-                    fs.Write(Data.PixelArray, 0, Data.PixelArray.Length);
+                    var bytes = ToBytes();
+                    fs.Write(bytes, 0, bytes.Length);
                 }
             }
             catch (Exception ex)
