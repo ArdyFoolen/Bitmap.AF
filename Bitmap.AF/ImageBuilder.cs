@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Bitmap.AF
         public class ImageBuilder
         {
             private readonly int bitsPerPixel = 3;
-            
+
             private ushort width;
             private short height;
             private BitmapData bitmapData;
@@ -76,9 +77,18 @@ namespace Bitmap.AF
 
                 int realY = height - 1 - y;
                 int index = RowSize * realY + x * bitsPerPixel;
-                bitmapData.PixelArray[index+2] = red;
+                bitmapData.PixelArray[index + 2] = red;
                 bitmapData.PixelArray[index + 1] = green;
                 bitmapData.PixelArray[index] = blue;
+
+                return this;
+            }
+
+            public ImageBuilder SetRectangle(Rectangle rectangle, byte red, byte green, byte blue)
+            {
+                for (int r = 0; r < rectangle.Height; r++)
+                    for (int c = 0; c < rectangle.Width; c++)
+                        SetPixel(rectangle.X + c, rectangle.Y + r, red, green, blue);
 
                 return this;
             }

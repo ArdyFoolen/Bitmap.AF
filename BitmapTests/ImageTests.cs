@@ -1,4 +1,5 @@
 using Bitmap.AF;
+using System.Drawing;
 using static Bitmap.AF.Image;
 
 namespace BitmapTests
@@ -71,6 +72,37 @@ namespace BitmapTests
 
             // Assert
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save2x2RGBW.bmp");
+        }
+
+        [Test]
+        public void SaveImage_SetRectangle_ShouldSucceed()
+        {
+            // Arrange
+            // Bottom to top, BGR format
+            // Creates a 2x2 bitmap
+            // _________________
+            // |  Red  | Green |
+            // _________________
+            // | Blue  | White |
+            // _________________
+            Rectangle rect00 = new Rectangle(0, 0, 4, 4);
+            Rectangle rect01 = new Rectangle(0, 4, 4, 4);
+            Rectangle rect10 = new Rectangle(4, 0, 4, 4);
+            Rectangle rect11 = new Rectangle(4, 4, 4, 4);
+            ImageBuilder builder = new ImageBuilder();
+            builder
+                .WithWith(8)
+                .WithHeight(8)
+                .SetRectangle(rect00, 255, 0, 0)
+                .SetRectangle(rect01, 0, 0, 255)
+                .SetRectangle(rect10, 0, 255, 0)
+                .SetRectangle(rect11, 255, 255, 255);
+
+            // Act
+            var image = builder.Build();
+
+            // Assert
+            image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save8x8RGBW.bmp");
         }
     }
 }
