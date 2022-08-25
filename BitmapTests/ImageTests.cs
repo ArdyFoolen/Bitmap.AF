@@ -43,7 +43,7 @@ namespace BitmapTests
             var image = builder.Build();
 
             // Assert
-            image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save2x2BGRW.bmp");
+            image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save2x2RWBG.bmp");
         }
 
         [Test]
