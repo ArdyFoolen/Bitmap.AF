@@ -67,6 +67,9 @@ namespace Bitmap.AF
                 return this;
             }
 
+            public ImageBuilder SetPixel(int x, int y, Color color)
+                => SetPixel(x, y, color.Red, color.Green, color.Blue);
+
             public ImageBuilder SetPixel(int x, int y, byte red, byte green, byte blue)
             {
                 Guard.Conforms(() => x >= 0 && x < width, "X out of range");
@@ -83,6 +86,9 @@ namespace Bitmap.AF
 
                 return this;
             }
+
+            public ImageBuilder SetRectangle(Rectangle rectangle, Color color)
+                => SetRectangle(rectangle, color.Red, color.Green, color.Blue);
 
             public ImageBuilder SetRectangle(Rectangle rectangle, byte red, byte green, byte blue)
             {
