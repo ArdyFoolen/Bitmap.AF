@@ -5,9 +5,9 @@ namespace Bitmap.AF
     public class BitmapFileHeader
     {
         //        The header field used to identify the BMP and DIB file is 0x42 0x4D in hexadecimal, same as BM in ASCII.The following entries are possible:
-        //BM
+        //BM 0x42 0x4D
         //Windows 3.1x, 95, NT, ... etc.
-        //BA
+        //BA 0x42 0x41
         //OS/2 struct bitmap array
         //CI
         //OS/2 struct color icon
