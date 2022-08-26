@@ -35,7 +35,6 @@ namespace Bitmap.Web
                     builder.SetRectangle(rectangle, red, green, blue);
                 }
 
-            // Act
             var image = builder.Build();
 
             return image.ToBytes();
