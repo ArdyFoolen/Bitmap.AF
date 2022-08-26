@@ -28,7 +28,7 @@ namespace Bitmap.Web
                 for (int c = 0; c < 29; c++)
                 {
                     Rectangle rectangle = new Rectangle(c * 8, r * 8, 8, 8);
-                    if (imageRepresentaion[r, c])
+                    if (imageRepresentation[r, c])
                         red = green = blue = 0;
                     else
                         red = green = blue = 255;
@@ -41,7 +41,7 @@ namespace Bitmap.Web
             return image.ToBytes();
         }
 
-        private bool[,] imageRepresentaion = new bool[29, 29]
+        private bool[,] imageRepresentation = new bool[29, 29]
         {
             { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
             { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
