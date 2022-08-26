@@ -1,0 +1,16 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <div style="margin-top:20px;">
+        <p style="margin:0px;">Syncplicity</p>
+        @Html.Raw(Model.QR.CreateHtmlImage("syncplicity.com", "i5kgissrge3xgvjs"))
+    </div>
+    <div style="margin-top:20px;">
+        <p style="margin:0px;">White Label</p>
+        @Html.Raw(Model.QR.CreateHtmlImage("syncplicity.syncp.me", "i5kgissrge3xgvjs"))
+    </div>
+</div>
