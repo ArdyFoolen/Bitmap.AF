@@ -5,18 +5,18 @@ namespace Bitmap.Web
 {
     public interface IQR
     {
-        string CreateHtmlImage(string host, string secret);
+        string CreateHtmlImage(string alt);
     }
 
     public class QR : IQR
     {
-        public string CreateHtmlImage(string host, string secret)
+        public string CreateHtmlImage(string alt)
         {
-            var image = Create(host, secret);
-            return $"<img src=\"data:image/png;base64,{Convert.ToBase64String(image)}\" alt=\"{secret}\" />";
+            var image = Create();
+            return $"<img src=\"data:image/png;base64,{Convert.ToBase64String(image)}\" alt=\"{alt}\" />";
         }
 
-        private byte[] Create(string host, string secret)
+        private byte[] Create()
         {
             ImageBuilder builder = new ImageBuilder();
             builder
