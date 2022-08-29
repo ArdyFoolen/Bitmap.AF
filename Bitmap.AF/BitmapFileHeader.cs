@@ -21,7 +21,9 @@ namespace Bitmap.AF
         public int FileSize { get; set; }
         public byte[] Reserved1 { get; } = new byte[2] { 0x00, 0x00 };
         public byte[] Reserved2 { get; } = new byte[2] { 0x00, 0x00 };
-        public int OffsetPixelArray { get; set; } = 26;
+        public int OffsetPixelArray { get; set; }
+
+        public int HeaderSize { get; } = 14;
 
         public byte[] ToBytes()
             => HeaderField.Concat(FileSize.ToBytes(), Reserved1, Reserved2, OffsetPixelArray.ToBytes());

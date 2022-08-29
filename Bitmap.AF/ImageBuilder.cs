@@ -11,25 +11,30 @@ namespace Bitmap.AF
     {
         public class ImageBuilder
         {
-            private readonly int bitsPerPixel = 3;
+            private IInfoHeaderFactory infoHeaderFactory = new OS21XHeaderFactory();
+            //private IInfoHeaderFactory infoHeaderFactory = new InfoHeaderFactory();
 
-            private ushort width;
-            private short height;
+            private uint width;
+            private uint height;
             private BitmapData bitmapData;
+
+            private bool usesColorTable = false;
+            private Dictionary<int, byte> colorTableIndex = new Dictionary<int, byte>();
+            private int BytesPerPixel { get => usesColorTable ? 1 : 3; }
 
             private int Padding
             {
                 get
                 {
-                    var padding = 4 - ((width * bitsPerPixel) % 4);
-                    return padding == 4 || Math.Abs(height) == 1 ? 0 : padding;
+                    var padding = (int)(4 - ((width * BytesPerPixel) % 4));
+                    return padding == 4 || height == 1 ? 0 : padding;
                 }
             }
             private int RowSize
             {
                 get
                 {
-                    return width * bitsPerPixel + Padding;
+                    return (int)(width * BytesPerPixel + Padding);
                 }
             }
 
@@ -40,22 +45,41 @@ namespace Bitmap.AF
                 Guard.Conforms(() => bitmapData.PixelArray.Length == (RowSize * Math.Abs(height)), "Bitmap pixel array not correct size");
 
                 var image = new Image();
-                image.OS21XHeader.Width = width;
-                image.OS21XHeader.Height = height;
 
+                image.InfoHeader = infoHeaderFactory.Create(width, height);
                 image.Data = bitmapData;
+
+                image.InfoHeader.BitsPerPixel = 24;
+                image.InfoHeader.ColorsUsed = (uint)colorTableIndex.Count;
+                if (usesColorTable)
+                {
+                    image.InfoHeader.BitsPerPixel = 8;
+                    image.ColorTable = colorTableIndex.Keys.SelectMany(s => s.ToBytes()).ToArray();
+                }
+
+                image.Header.OffsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
                 image.Header.FileSize = image.Header.OffsetPixelArray + image.Data.PixelArray.Length;
 
                 return image;
             }
 
-            public ImageBuilder WithWith(ushort width)
+            public ImageBuilder UseColorTable()
+            {
+                Guard.Conforms(() => bitmapData == null, "Not allowed to use colors table");
+
+                infoHeaderFactory = new InfoHeaderFactory();
+                usesColorTable = true;
+
+                return this;
+            }
+
+            public ImageBuilder WithWith(uint width)
             {
                 this.width = width;
                 return this;
             }
 
-            public ImageBuilder WithHeight(short height)
+            public ImageBuilder WithHeight(uint height)
             {
                 this.height = height;
                 return this;
@@ -74,15 +98,13 @@ namespace Bitmap.AF
             {
                 Guard.Conforms(() => x >= 0 && x < width, "X out of range");
                 Guard.Conforms(() => y >= 0 && y < height, "Y out of range");
-                Guard.Conforms(() => (RowSize * Math.Abs(height)) != 0, "Width or Height are not set");
+                Guard.Conforms(() => (RowSize * height) != 0, "Width or Height are not set");
 
                 InitializeBitmapData();
 
-                int realY = height - 1 - y;
-                int index = RowSize * realY + x * bitsPerPixel;
-                bitmapData.PixelArray[index + 2] = red;
-                bitmapData.PixelArray[index + 1] = green;
-                bitmapData.PixelArray[index] = blue;
+                int realY = (int)(height - 1 - y);
+                int index = RowSize * realY + x * BytesPerPixel;
+                SetPixel(red, green, blue, index);
 
                 return this;
             }
@@ -99,13 +121,31 @@ namespace Bitmap.AF
                 return this;
             }
 
+            private void SetPixel(byte red, byte green, byte blue, int index)
+            {
+                if (usesColorTable)
+                {
+                    //var colorIndex = (blue << 16) + (green << 8) + red;
+                    var colorIndex = (red << 16) + (green << 8) + blue;
+                    if (!colorTableIndex.ContainsKey(colorIndex))
+                        colorTableIndex.Add(colorIndex, (byte)colorTableIndex.Count);
+                    bitmapData.PixelArray[index] = colorTableIndex[colorIndex];
+                }
+                else
+                {
+                    bitmapData.PixelArray[index + 2] = red;
+                    bitmapData.PixelArray[index + 1] = green;
+                    bitmapData.PixelArray[index] = blue;
+                }
+            }
+
             private void InitializeBitmapData()
             {
                 if (bitmapData != null)
                     return;
 
                 bitmapData = new BitmapData();
-                bitmapData.PixelArray = new byte[RowSize * Math.Abs(height)];
+                bitmapData.PixelArray = new byte[RowSize * height];
             }
         }
     }
