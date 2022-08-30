@@ -8,6 +8,6 @@ namespace Bitmap.AF
 {
     public interface IInfoHeaderFactory
     {
-        IBitmapInfoHeader Create(uint width, uint height);
+        IBitmapInfoHeader Create(uint width, uint height, uint colorsUsed);
     }
 }

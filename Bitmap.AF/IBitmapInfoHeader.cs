@@ -9,8 +9,7 @@ namespace Bitmap.AF
     public interface IBitmapInfoHeader
     {
         int HeaderSize { get; }
-        ushort BitsPerPixel { get; set; }
-        uint ColorsUsed { get; set; }
+        ushort BitsPerPixel { get; }
         byte[] ToBytes();
     }
 }

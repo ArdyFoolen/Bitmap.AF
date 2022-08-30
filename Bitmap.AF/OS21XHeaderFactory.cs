@@ -9,7 +9,7 @@ namespace Bitmap.AF
 {
     public class OS21XHeaderFactory : IInfoHeaderFactory
     {
-        public IBitmapInfoHeader Create(uint width, uint height)
+        public IBitmapInfoHeader Create(uint width, uint height, uint colorsUsed)
         {
             var header = new OS21XBitmapHeader();
 

@@ -1,4 +1,5 @@
 using Bitmap.AF;
+using BitmapTests.Helpers;
 using System.Drawing;
 using static Bitmap.AF.Image;
 
@@ -11,41 +12,41 @@ namespace BitmapTests
         {
         }
 
-        [Test]
-        public void SaveImage_ShouldSucceed()
-        {
-            // Arrange
-            // Bottom to top, BGR format
-            // Creates a 2x2 bitmap
-            // _________________
-            // |  Red  | White |
-            // _________________
-            // | Blue  | Green |
-            // _________________
-            byte[] pixelArray = new byte[16]
-            {
-                255, 0, 0,      // Blue
-                0, 255, 0,      // Green
-                0, 0,           // Padding of Row to be multiple of 4 bytes
-                0, 0, 255,      // Red
-                255, 255, 255,  // White
-                0, 0            // Padding of Row to be multiple of 4 bytes
-            };
-            BitmapData bitmapData = new BitmapData();
-            bitmapData.PixelArray = pixelArray;
+        //[Test]
+        //public void SaveImage_ShouldSucceed()
+        //{
+        //    // Arrange
+        //    // Bottom to top, BGR format
+        //    // Creates a 2x2 bitmap
+        //    // _________________
+        //    // |  Red  | White |
+        //    // _________________
+        //    // | Blue  | Green |
+        //    // _________________
+        //    byte[] pixelArray = new byte[16]
+        //    {
+        //        255, 0, 0,      // Blue
+        //        0, 255, 0,      // Green
+        //        0, 0,           // Padding of Row to be multiple of 4 bytes
+        //        0, 0, 255,      // Red
+        //        255, 255, 255,  // White
+        //        0, 0            // Padding of Row to be multiple of 4 bytes
+        //    };
+        //    BitmapData bitmapData = new BitmapData();
+        //    bitmapData.PixelArray = pixelArray;
 
-            ImageBuilder builder = new ImageBuilder();
-            builder
-                .WithWith(2)
-                .WithHeight(2)
-                .WithBitmapData(bitmapData);
+        //    ImageBuilder builder = new ImageBuilder();
+        //    builder
+        //        .WithWith(2)
+        //        .WithHeight(2)
+        //        .WithBitmapData(bitmapData);
 
-            // Act
-            var image = builder.Build();
+        //    // Act
+        //    var image = builder.Build();
 
-            // Assert
-            image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save2x2RWBG.bmp");
-        }
+        //    // Assert
+        //    image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save2x2RWBG.bmp");
+        //}
 
         [Test]
         public void SaveImage_SetPixel_ShouldSucceed()
@@ -135,6 +136,48 @@ namespace BitmapTests
 
             // Assert
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save8x8UseColorTableRGBW.bmp");
+        }
+
+        [Test]
+        public void SaveImage_UseColorTableSetRectangleRedWhiteWhiteRed_ShouldSucceed()
+        {
+            // Arrange
+            // Bottom to top, BGR format
+            // Creates a 2x2 bitmap
+            // _________________
+            // |  Red  | White |
+            // _________________
+            // | White |  Red  |
+            // _________________
+            Rectangle rect00 = new Rectangle(0, 0, 4, 4);
+            Rectangle rect01 = new Rectangle(0, 4, 4, 4);
+            Rectangle rect10 = new Rectangle(4, 0, 4, 4);
+            Rectangle rect11 = new Rectangle(4, 4, 4, 4);
+            ImageBuilder builder = new ImageBuilder();
+            builder
+                .UseColorTable()
+                .WithWith(8)
+                .WithHeight(8)
+                .SetRectangle(rect00, 255, 0, 0)
+                .SetRectangle(rect01, 255, 255, 255)
+                .SetRectangle(rect10, 255, 255, 255)
+                .SetRectangle(rect11, 255, 0, 0);
+
+            // Act
+            var image = builder.Build();
+
+            // Assert
+            image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save8x8UseColorTable2RWWR.bmp");
+        }
+
+        [Test]
+        public void SaveImage_UseColorTable2SetRectangle_ShouldSucceed()
+        {
+            // Arrange & Act
+            var image = ImageRepresentation.CreateVer1();
+
+            // Assert
+            image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\Save8x8UseColorTable2RGBW.bmp");
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Bitmap.AF
         public BitmapFileHeader Header { get; } = new BitmapFileHeader();
         public IBitmapInfoHeader InfoHeader { get; private set; }
         public byte[] ColorTable { get; private set; } = new byte[0];
-        public BitmapData Data { get; private set; }
+        public BitmapData Data { get; private set; } = new BitmapData();
 
         private Image() { }
 

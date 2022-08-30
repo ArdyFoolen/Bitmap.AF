@@ -1,69 +1,17 @@
-﻿using static Bitmap.AF.Image;
+﻿using Bitmap.AF;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static Bitmap.AF.Image;
 
-namespace Bitmap.Web
+namespace BitmapTests.Helpers
 {
-    public interface IQR
+    internal static class ImageRepresentation
     {
-        string CreateHtmlImage(string alt);
-        string CreateHtmlImageWithColorTable(string alt);
-    }
-
-    public class QR : IQR
-    {
-        public string CreateHtmlImage(string alt)
-        {
-            var image = Create();
-            return $"<img src=\"data:image/png;base64,{Convert.ToBase64String(image)}\" alt=\"{alt}\" />";
-        }
-
-        public string CreateHtmlImageWithColorTable(string alt)
-        {
-            var image = CreateWithColorTable();
-            return $"<img src=\"data:image/png;base64,{Convert.ToBase64String(image)}\" alt=\"{alt}\" />";
-        }
-
-        private byte[] Create()
-        {
-            ImageBuilder builder = new ImageBuilder();
-            builder
-                .WithWith(232)
-                .WithHeight(232);
-
-            return BuildFromImageRepresentaion(builder);
-        }
-
-        private byte[] CreateWithColorTable()
-        {
-            ImageBuilder builder = new ImageBuilder();
-            builder
-                .UseColorTable()
-                .WithWith(232)
-                .WithHeight(232);
-
-            return BuildFromImageRepresentaion(builder);
-        }
-
-        private byte[] BuildFromImageRepresentaion(ImageBuilder builder)
-        {
-            byte red, green, blue;
-            for (int r = 0; r < 29; r++)
-                for (int c = 0; c < 29; c++)
-                {
-                    Rectangle rectangle = new Rectangle(c * 8, r * 8, 8, 8);
-                    if (imageRepresentation[r, c])
-                        red = green = blue = 0;
-                    else
-                        red = green = blue = 255;
-                    builder.SetRectangle(rectangle, red, green, blue);
-                }
-
-            var image = builder.Build();
-
-            return image.ToBytes();
-        }
-
-        private bool[,] imageRepresentation = new bool[29, 29]
+        private static bool[,] Ver1 = new bool[29, 29]
         {
             { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
             { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
@@ -95,5 +43,33 @@ namespace Bitmap.Web
             { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
             { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false }
         };
+
+        public static Image CreateVer1()
+        {
+            ImageBuilder builder = new ImageBuilder();
+            builder
+                .UseColorTable()
+                .WithWith(232)
+                .WithHeight(232);
+
+            return BuildFromImageRepresentaion(builder, Ver1);
+        }
+
+        private static Image BuildFromImageRepresentaion(ImageBuilder builder, bool[,] representation)
+        {
+            byte red, green, blue;
+            for (int r = 0; r < 29; r++)
+                for (int c = 0; c < 29; c++)
+                {
+                    Rectangle rectangle = new Rectangle(c * 8, r * 8, 8, 8);
+                    if (representation[r, c])
+                        red = green = blue = 0;
+                    else
+                        red = green = blue = 255;
+                    builder.SetRectangle(rectangle, red, green, blue);
+                }
+
+            return builder.Build();
+        }
     }
 }
