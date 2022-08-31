@@ -20,23 +20,6 @@ namespace Bitmap.AF
 
             private bool usesColorTable = false;
             private Dictionary<int, byte> colorTableIndex = new Dictionary<int, byte>();
-            private int BytesPerPixel { get => usesColorTable ? 1 : 3; }
-
-            private int Padding
-            {
-                get
-                {
-                    var padding = (int)(4 - ((width * BytesPerPixel) % 4));
-                    return padding == 4 || height == 1 ? 0 : padding;
-                }
-            }
-            private int RowSize
-            {
-                get
-                {
-                    return (int)(width * BytesPerPixel + Padding);
-                }
-            }
 
             public Image Build()
             {
@@ -247,19 +230,19 @@ namespace Bitmap.AF
 
             private void SetPixelArrayBPP24(Image image)
             {
-                var prepadding = (int)(4 - ((width * BytesPerPixel) % 4));
+                var prepadding = (int)(4 - ((width * 3) % 4));
                 int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-                int rowsize = (int)(width * BytesPerPixel + padding);
+                int rowsize = (int)(width * 3 + padding);
 
                 image.Data.PixelArray = new byte[rowsize * height];
                 for (int y = 0; y < height; y++)
                     for (int x = 0; x < width; x++)
                     {
                         int realY = (int)(height - 1 - y);
-                        int index = RowSize * realY + x * BytesPerPixel;
-                        image.Data.PixelArray[index] = pixelArray[y][x];
-                        image.Data.PixelArray[index + 1] = pixelArray[y][x + 1];
-                        image.Data.PixelArray[index + 2] = pixelArray[y][x + 2];
+                        int index = rowsize * realY + x * 3;
+                        image.Data.PixelArray[index] = pixelArray[y][x * 3];
+                        image.Data.PixelArray[index + 1] = pixelArray[y][x * 3 + 1];
+                        image.Data.PixelArray[index + 2] = pixelArray[y][x * 3 + 2];
                     }
             }
 

@@ -27,6 +27,7 @@ namespace Bitmap.Web
         {
             ImageBuilder builder = new ImageBuilder();
             builder
+                .UseInfoHeader()
                 .WithWith(232)
                 .WithHeight(232);
 

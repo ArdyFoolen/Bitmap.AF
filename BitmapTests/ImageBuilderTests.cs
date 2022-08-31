@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Bitmap.AF.Image;
+using Color = Bitmap.AF.Color;
 
 namespace BitmapTests
 {
@@ -107,6 +108,44 @@ namespace BitmapTests
             Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
 
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveOS21X8x8Black.bmp");
+        }
+
+        [Test]
+        public void Build_OS21XHeader2_ShouldSucceed()
+        {
+            // Arrange
+            uint height = 24;
+            uint width = 24;
+
+            var builder = new ImageBuilder();
+            builder
+                .UseOS21XHeader()
+                .WithWith(width)
+                .WithHeight(height);
+
+            Color[,] colors = new Color[3, 3]
+            {
+                { new Color(255, 0, 0), new Color(0, 255, 0), new Color(0, 0, 255) },
+                { new Color(255, 255, 255), new Color(255, 255, 0), new Color(0, 255, 255) },
+                { new Color(255, 0, 255), new Color(125, 125, 125), new Color(255, 255, 255) }
+            };
+
+            for (int h = 0; h < 3; h++)
+                for (int v = 0; v < 3; v++)
+                    builder.SetRectangle(new Rectangle(h * 8, v * 8, 8, 8), colors[h, v]);
+
+            // Act
+            var image = builder.Build();
+
+            // Assert
+            int padding = Padding(height, width);
+            int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * ((int)width * BytesPerPixel + padding);
+            int offsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
+            AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
+            AssertBitmapOS21XHeader(image.InfoHeader, (ushort)height, (ushort)width);
+            Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
+
+            image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveOS21X8x8Colored.bmp");
         }
 
         [Test]
