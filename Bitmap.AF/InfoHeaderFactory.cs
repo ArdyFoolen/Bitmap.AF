@@ -10,6 +10,7 @@ namespace Bitmap.AF
 {
     public class InfoHeaderFactory : IInfoHeaderFactory
     {
+        public IBitsPerPixel BitsPerPixel { get; private set; }
         internal bool UseColorTable { get; set; }
 
         internal InfoHeaderFactory(bool useColorTable)
@@ -17,17 +18,32 @@ namespace Bitmap.AF
             UseColorTable = useColorTable;
         }
 
-        public IBitmapInfoHeader Create(uint width, uint height, uint colorsUsed)
+        public IBitmapInfoHeader Create(uint width, uint height, Dictionary<int, byte> colorTableIndex)
         {
-            BitmapInfoHeader header;
-            //if (!UseColorTable)
-                header = new BitmapInfoHeader();
-            //else
-            //    throw new Exception();
-
-            SetHeaderProperties(header, width, height, colorsUsed);
+            BitmapInfoHeader header = new BitmapInfoHeader();
+            SetHeaderProperties(header, width, height, (uint)colorTableIndex.Count);
+            CreateBitsPerPixel(header, colorTableIndex, width, height);
 
             return header;
+        }
+
+        private void CreateBitsPerPixel(BitmapInfoHeader header, Dictionary<int, byte> colorTableIndex, uint width, uint height)
+        {
+            switch (header.BitsPerPixel)
+            {
+                case 1:
+                    BitsPerPixel = new BitsPerPixel01(colorTableIndex, width, height);
+                    break;
+                case 4:
+                    BitsPerPixel = new BitsPerPixel04(colorTableIndex, width, height);
+                    break;
+                case 8:
+                    BitsPerPixel = new BitsPerPixel08(colorTableIndex, width, height);
+                    break;
+                case 24:
+                    BitsPerPixel = new BitsPerPixel24(width, height);
+                    break;
+            }
         }
 
         private void SetHeaderProperties(BitmapInfoHeader header, uint width, uint height, uint colorsUsed)
@@ -35,7 +51,7 @@ namespace Bitmap.AF
             header.Width = width;
             header.Height = height;
             header.ColorsUsed = colorsUsed;
-            header.BitsPerPixel = CalculateBitsPerPixel(colorsUsed); 
+            header.BitsPerPixel = CalculateBitsPerPixel(colorsUsed);
         }
 
         private ushort CalculateBitsPerPixel(uint colorsUsed)

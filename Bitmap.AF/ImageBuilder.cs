@@ -32,13 +32,10 @@ namespace Bitmap.AF
 
                 SetColorTableIndex();
 
-                image.InfoHeader = infoHeaderFactory.Create(width, height, (uint)colorTableIndex.Count);
+                image.InfoHeader = infoHeaderFactory.Create(width, height, colorTableIndex);
                 image.ColorTable = colorTableIndex.Keys.SelectMany(s => s.ToBytes()).ToArray();
 
-                if (usesColorTable)
-                    SetPixelArrayColorTable(image);
-                else
-                    SetPixelArrayBPP24(image);
+                infoHeaderFactory.BitsPerPixel.SetPixelArray(image, pixelArray);
 
                 image.Header.OffsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
                 image.Header.FileSize = image.Header.OffsetPixelArray + image.Data.PixelArray.Length;
@@ -126,124 +123,6 @@ namespace Bitmap.AF
                     return;
 
                 pixelArray = new byte[height][];
-            }
-
-            private void SetPixelArrayColorTable(Image image)
-            {
-                switch (image.InfoHeader.BitsPerPixel)
-                {
-                    case 1:
-                        SetPixelArrayBPP01(image);
-                        break;
-                    case 4:
-                        SetPixelArrayBPP04(image);
-                        break;
-                    case 8:
-                        SetPixelArrayBPP08(image);
-                        break;
-                    default: throw new ArgumentOutOfRangeException(nameof(image.InfoHeader.BitsPerPixel));
-                }
-            }
-
-            private void SetPixelArrayBPP01(Image image)
-            {
-                var nbrOfBytes = (int)Math.Ceiling((decimal)width / 8);
-                var prepadding = 4 - nbrOfBytes % 4;
-                int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-                int rowsize = nbrOfBytes + padding;
-
-                image.Data.PixelArray = new byte[rowsize * height];
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++)
-                    {
-                        int realY = (int)(height - 1 - y);
-                        int index = rowsize * realY + x / 8;
-
-                        byte red = pixelArray[y][x * 3 + 2];
-                        byte green = pixelArray[y][x * 3 + 1];
-                        byte blue = pixelArray[y][x * 3];
-
-                        var colorIndex = (red << 16) + (green << 8) + blue;
-                        if (!colorTableIndex.ContainsKey(colorIndex))
-                            throw new Exception();
-                        byte color = colorTableIndex[colorIndex];
-                        color = (byte)(color << (7 - x % 8));
-
-                        image.Data.PixelArray[index] |= color;
-                    }
-            }
-
-            private void SetPixelArrayBPP04(Image image)
-            {
-                var nbrOfBytes = (int)Math.Ceiling((decimal)width / 2);
-                var prepadding = 4 - nbrOfBytes % 4;
-                int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-                int rowsize = nbrOfBytes + padding;
-
-                image.Data.PixelArray = new byte[rowsize * height];
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++)
-                    {
-                        int realY = (int)(height - 1 - y);
-                        int index = rowsize * realY + x / 2;
-
-                        byte red = pixelArray[y][x * 3 + 2];
-                        byte green = pixelArray[y][x * 3 + 1];
-                        byte blue = pixelArray[y][x * 3];
-
-                        var colorIndex = (red << 16) + (green << 8) + blue;
-                        if (!colorTableIndex.ContainsKey(colorIndex))
-                            throw new Exception();
-                        byte color = colorTableIndex[colorIndex];
-                        color = (byte)(color << (x % 2 * 4));
-
-                        image.Data.PixelArray[index] |= color;
-                    }
-            }
-
-            private void SetPixelArrayBPP08(Image image)
-            {
-                var nbrOfBytes = (int)width;
-                var prepadding = 4 - nbrOfBytes % 4;
-                int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-                int rowsize = nbrOfBytes + padding;
-
-                image.Data.PixelArray = new byte[rowsize * height];
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++)
-                    {
-                        int realY = (int)(height - 1 - y);
-                        int index = rowsize * realY + x;
-
-                        byte red = pixelArray[y][x * 3 + 2];
-                        byte green = pixelArray[y][x * 3 + 1];
-                        byte blue = pixelArray[y][x * 3];
-
-                        var colorIndex = (red << 16) + (green << 8) + blue;
-                        if (!colorTableIndex.ContainsKey(colorIndex))
-                            throw new Exception();
-                        byte color = colorTableIndex[colorIndex];
-
-                        image.Data.PixelArray[index] |= color;
-                    }
-            }
-
-            private void SetPixelArrayBPP24(Image image)
-            {
-                var prepadding = (int)(4 - ((width * 3) % 4));
-                int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-                int rowsize = (int)(width * 3 + padding);
-
-                image.Data.PixelArray = new byte[rowsize * height];
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++)
-                    {
-                        int realY = (int)(height - 1 - y);
-                        int index = rowsize * realY + x * 3;
-                        image.Data.PixelArray[index] = pixelArray[y][x * 3];
-                        image.Data.PixelArray[index + 1] = pixelArray[y][x * 3 + 1];
-                        image.Data.PixelArray[index + 2] = pixelArray[y][x * 3 + 2];
-                    }
             }
 
             private void SetColorTableIndex()
