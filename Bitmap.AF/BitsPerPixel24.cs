@@ -6,29 +6,26 @@ using System.Threading.Tasks;
 
 namespace Bitmap.AF
 {
-    public class BitsPerPixel24 : IBitsPerPixel
+    public class BitsPerPixel24 : BitsPerPixel
     {
-        private uint width;
-        private uint height;
+        protected override int NbrOfBytes { get => (int)(width * 3); }
 
-        public BitsPerPixel24(uint width, uint height)
+        public BitsPerPixel24(uint width, uint height) : base(width, height) { }
+
+        protected override int Index(int x, int y)
         {
-            this.width = width;
-            this.height = height;
+            int realY = (int)(height - 1 - y);
+            return RowSize * realY + x * 3;
         }
 
-        public void SetPixelArray(Image image, byte[][] pixelArray)
+        public override void SetPixelArray(Image image, byte[][] pixelArray)
         {
-            var prepadding = (int)(4 - ((width * 3) % 4));
-            int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-            int rowsize = (int)(width * 3 + padding);
-
-            image.Data.PixelArray = new byte[rowsize * height];
+            image.Data.PixelArray = InitializePixelArray;
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                 {
-                    int realY = (int)(height - 1 - y);
-                    int index = rowsize * realY + x * 3;
+                    int index = Index(x, y);
+
                     image.Data.PixelArray[index] = pixelArray[y][x * 3];
                     image.Data.PixelArray[index + 1] = pixelArray[y][x * 3 + 1];
                     image.Data.PixelArray[index + 2] = pixelArray[y][x * 3 + 2];

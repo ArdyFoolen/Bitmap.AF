@@ -6,43 +6,29 @@ using System.Threading.Tasks;
 
 namespace Bitmap.AF
 {
-    public class BitsPerPixel08 : IBitsPerPixel
+    public class BitsPerPixel08 : ColorTableIndex
     {
-        Dictionary<int, byte> colorTableIndex;
-        private uint width;
-        private uint height;
+        protected override int NbrOfBytes { get => (int)width; }
 
-        public BitsPerPixel08(Dictionary<int, byte> colorTableIndex, uint width, uint height)
+        public BitsPerPixel08(Dictionary<int, byte> colorTableIndex, uint width, uint height) : base(colorTableIndex, width, height) { }
+
+        protected override int Index(int x, int y)
         {
-            this.colorTableIndex = colorTableIndex;
-            this.width = width;
-            this.height = height;
+            int realY = (int)(height - 1 - y);
+            return RowSize * realY + x;
         }
 
-        public void SetPixelArray(Image image, byte[][] pixelArray)
-        {
-            var nbrOfBytes = (int)width;
-            var prepadding = 4 - nbrOfBytes % 4;
-            int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-            int rowsize = nbrOfBytes + padding;
+        protected override byte ShiftColor(int x, byte color)
+            => color;
 
-            image.Data.PixelArray = new byte[rowsize * height];
+        public override void SetPixelArray(Image image, byte[][] pixelArray)
+        {
+            image.Data.PixelArray = InitializePixelArray;
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                 {
-                    int realY = (int)(height - 1 - y);
-                    int index = rowsize * realY + x;
-
-                    byte red = pixelArray[y][x * 3 + 2];
-                    byte green = pixelArray[y][x * 3 + 1];
-                    byte blue = pixelArray[y][x * 3];
-
-                    var colorIndex = (red << 16) + (green << 8) + blue;
-                    if (!colorTableIndex.ContainsKey(colorIndex))
-                        throw new Exception();
-                    byte color = colorTableIndex[colorIndex];
-
-                    image.Data.PixelArray[index] |= color;
+                    int index = Index(x, y);
+                    image.Data.PixelArray[index] |= GetColor(pixelArray, x, y);
                 }
         }
     }
