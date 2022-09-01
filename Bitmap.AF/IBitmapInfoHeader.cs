@@ -10,6 +10,7 @@ namespace Bitmap.AF
     {
         int HeaderSize { get; }
         ushort BitsPerPixel { get; }
+        uint ColorsUsed { get; }
         byte[] ToBytes();
     }
 }

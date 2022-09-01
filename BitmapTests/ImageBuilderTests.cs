@@ -30,7 +30,7 @@ namespace BitmapTests
             var exception = Assert.Throws<ArgumentException>(() => action());
 
             Assert.NotNull(exception);
-            Assert.AreEqual("Width cannot be 0", exception.Message);
+            Assert.That(exception.Message, Is.EqualTo("Width cannot be 0"));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace BitmapTests
             var exception = Assert.Throws<ArgumentException>(() => action());
 
             Assert.NotNull(exception);
-            Assert.AreEqual("Height cannot be 0", exception.Message);
+            Assert.That(exception.Message, Is.EqualTo("Height cannot be 0"));
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace BitmapTests
             var exception = Assert.Throws<ArgumentException>(() => action());
 
             Assert.NotNull(exception);
-            Assert.AreEqual("Bitmap pixel array not correct height", exception.Message);
+            Assert.That(exception.Message, Is.EqualTo("Bitmap pixel array not correct height"));
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace BitmapTests
             var exception = Assert.Throws<ArgumentException>(() => action());
 
             Assert.NotNull(exception);
-            Assert.AreEqual("Bitmap pixel array not correct width", exception.Message);
+            Assert.That(exception.Message, Is.EqualTo("Bitmap pixel array not correct width"));
         }
 
         [Test]
@@ -103,9 +103,9 @@ namespace BitmapTests
             int padding = Padding(height, width);
             int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * ((int)width * BytesPerPixel + padding);
             int offsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
-            AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
-            AssertBitmapOS21XHeader(image.InfoHeader, (ushort)height, (ushort)width);
-            Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
+            Helpers.AssertionHelper.AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
+            Helpers.AssertionHelper.AssertBitmapOS21XHeader(image.InfoHeader, (ushort)height, (ushort)width);
+            Assert.That(image.Data.PixelArray.Length, Is.EqualTo(fileSize - offsetPixelArray));
 
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveOS21X8x8Black.bmp");
         }
@@ -141,9 +141,9 @@ namespace BitmapTests
             int padding = Padding(height, width);
             int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * ((int)width * BytesPerPixel + padding);
             int offsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
-            AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
-            AssertBitmapOS21XHeader(image.InfoHeader, (ushort)height, (ushort)width);
-            Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
+            Helpers.AssertionHelper.AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
+            Helpers.AssertionHelper.AssertBitmapOS21XHeader(image.InfoHeader, (ushort)height, (ushort)width);
+            Assert.That(image.Data.PixelArray.Length, Is.EqualTo(fileSize - offsetPixelArray));
 
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveOS21X8x8Colored.bmp");
         }
@@ -170,9 +170,9 @@ namespace BitmapTests
             int padding = Padding(height, width);
             int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * ((int)width * BytesPerPixel + padding);
             int offsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
-            AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
-            AssertBitmapInfoHeader(image.InfoHeader, height, width);
-            Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
+            Helpers.AssertionHelper.AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
+            Helpers.AssertionHelper.AssertBitmapInfoHeader(image.InfoHeader, height, width);
+            Assert.That(image.Data.PixelArray.Length, Is.EqualTo(fileSize - offsetPixelArray));
 
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveInfo8x8Black.bmp");
         }
@@ -207,11 +207,11 @@ namespace BitmapTests
             var nbrOfBytes = (int)Math.Ceiling((decimal)width / 8);
             var prepadding = 4 - nbrOfBytes % 4;
             int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-            int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * ((int)Math.Ceiling((decimal)width / 8) + padding);
+            int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * (nbrOfBytes + padding);
             int offsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
-            AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
-            AssertBitmapInfoHeader(image.InfoHeader, height, width, 1, 2);
-            Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
+            Helpers.AssertionHelper.AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
+            Helpers.AssertionHelper.AssertBitmapInfoHeader(image.InfoHeader, height, width, 1, 2);
+            Assert.That(image.Data.PixelArray.Length, Is.EqualTo(fileSize - offsetPixelArray));
 
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveInfo8x8ColorTableBpp1RWWR.bmp");
         }
@@ -246,11 +246,11 @@ namespace BitmapTests
             var nbrOfBytes = (int)Math.Ceiling((decimal)width / 2);
             var prepadding = 4 - nbrOfBytes % 4;
             int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
-            int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * ((int)Math.Ceiling((decimal)width / 2) + padding);
+            int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * (nbrOfBytes + padding);
             int offsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
-            AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
-            AssertBitmapInfoHeader(image.InfoHeader, height, width, 4, 4);
-            Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
+            Helpers.AssertionHelper.AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
+            Helpers.AssertionHelper.AssertBitmapInfoHeader(image.InfoHeader, height, width, 4, 4);
+            Assert.That(image.Data.PixelArray.Length, Is.EqualTo(fileSize - offsetPixelArray));
 
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveInfo8x8ColorTableBpp4RGBW.bmp");
         }
@@ -281,9 +281,9 @@ namespace BitmapTests
             int padding = prepadding == 4 || height == 1 ? 0 : prepadding;
             int fileSize = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length + (int)height * (int)(width + padding);
             int offsetPixelArray = image.Header.HeaderSize + image.InfoHeader.HeaderSize + image.ColorTable.Length;
-            AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
-            AssertBitmapInfoHeader(image.InfoHeader, height, width, 8, 64);
-            Assert.AreEqual(fileSize - offsetPixelArray, image.Data.PixelArray.Length);
+            Helpers.AssertionHelper.AssertBitmapFileHeader(image.Header, fileSize, offsetPixelArray);
+            Helpers.AssertionHelper.AssertBitmapInfoHeader(image.InfoHeader, height, width, 8, 64);
+            Assert.That(image.Data.PixelArray.Length, Is.EqualTo(fileSize - offsetPixelArray));
 
             image.Save("C:\\Users\\HP-OMEN\\Documents\\Visual Studio 2019\\Git\\Bitmap.AF\\BitmapTests\\Images\\SaveInfo8x8ColorTableBpp8Reds.bmp");
         }
@@ -302,7 +302,7 @@ namespace BitmapTests
             var exception = Assert.Throws<ArgumentException>(() => action());
 
             Assert.NotNull(exception);
-            Assert.AreEqual("X out of range", exception.Message);
+            Assert.That(exception.Message, Is.EqualTo("X out of range"));
         }
 
         [TestCase(-1)]
@@ -319,45 +319,7 @@ namespace BitmapTests
             var exception = Assert.Throws<ArgumentException>(() => action());
 
             Assert.NotNull(exception);
-            Assert.AreEqual("Y out of range", exception.Message);
-        }
-
-        private void AssertBitmapFileHeader(BitmapFileHeader header, int fileSize, int offsetPixelArray)
-        {
-            Assert.NotNull(header);
-            Assert.AreEqual(header.HeaderField[0], 0x42);
-            Assert.AreEqual(header.HeaderField[1], 0x4D);
-            Assert.AreEqual(header.FileSize, fileSize);
-            Assert.AreEqual(header.OffsetPixelArray, offsetPixelArray);
-            Assert.AreEqual(header.HeaderSize, 14);
-        }
-
-        private void AssertBitmapOS21XHeader(IBitmapInfoHeader infoHeader, ushort height, ushort width)
-        {
-            OS21XBitmapHeader header = infoHeader as OS21XBitmapHeader;
-            Assert.NotNull(header);
-            Assert.AreEqual(header.HeaderSize, 12);
-            Assert.AreEqual(header.Height, height);
-            Assert.AreEqual(header.Width, width);
-            Assert.AreEqual(header.NumberOfColorPlanes, 1);
-            Assert.AreEqual(header.BitsPerPixel, 24);
-        }
-
-        private void AssertBitmapInfoHeader(IBitmapInfoHeader infoHeader, uint height, uint width, ushort bitspPerPixel = 24, uint colorsUsed = 0)
-        {
-            BitmapInfoHeader header = infoHeader as BitmapInfoHeader;
-            Assert.NotNull(header);
-            Assert.AreEqual(header.HeaderSize, 40);
-            Assert.AreEqual(header.Height, height);
-            Assert.AreEqual(header.Width, width);
-            Assert.AreEqual(header.NumberOfColorPlanes, 1);
-            Assert.AreEqual(header.BitsPerPixel, bitspPerPixel);
-            Assert.AreEqual(header.Compression, 0);
-            Assert.AreEqual(header.ImageSize, 0);
-            Assert.AreEqual(header.HorizontalResolution, 2835);
-            Assert.AreEqual(header.VerticalResolution, 2835);
-            Assert.AreEqual(header.ColorsUsed, colorsUsed);
-            Assert.AreEqual(header.ColorsImportant, 0);
+            Assert.That(exception.Message, Is.EqualTo("Y out of range"));
         }
 
         private int Padding(uint height, uint width)
